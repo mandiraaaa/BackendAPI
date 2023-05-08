@@ -7,9 +7,7 @@ namespace BackendAPI.Models
     public class Perfomence
     {
         public Guid id { get; set; }
-        public string Empid { get; set; }
         public string Employee_name { get; set; }    
-        public string Taskid { get; set; }
         public string Taskname { get; set; }
 
         [DataType(DataType.Date)]

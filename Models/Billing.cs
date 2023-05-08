@@ -6,9 +6,9 @@ namespace BackendAPI.Models
     {
         [Key]
         public Guid Id { get; set; }
-        public Guid customerId { get; set; }
-        public double price { get; set; }
-        public double paidAmount { get; set; }
-        public double tax { get; set; }
+        public string CustomerPhoneNumber { get; set; }
+        public string installmentName { get; set; }
+        public double Amount { get; set; }
+        
     }
 }

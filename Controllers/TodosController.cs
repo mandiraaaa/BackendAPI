@@ -97,13 +97,14 @@ namespace BackendAPI.Controllers
             var existingTodo = await _mainDbContext.Todos.FirstOrDefaultAsync(x => x.Id == id);
             if (existingTodo != null)
             {
-                existingTodo.Id = todo.Id;
+                //existingTodo.Id = todo.Id;
                 existingTodo.Name = todo.Name;
                 existingTodo.StartDate = todo.StartDate;
                 existingTodo.DueDate = todo.DueDate;
-                existingTodo.AssignedTo = todo.AssignedTo;
+                existingTodo.Assignee = todo.Assignee;
                 existingTodo.Priority = todo.Priority;
                 existingTodo.Status = todo.Status;
+                existingTodo.sprint_Name = todo.sprint_Name;
                 await _mainDbContext.SaveChangesAsync();
                 return Ok(existingTodo);
             }
@@ -126,51 +127,146 @@ namespace BackendAPI.Controllers
 
             return NotFound("Task not found");
         }
+        //get status 10 filtered employee.....................
+        //[HttpGet("gettodosbyusername/{username}")]
+        ////[Route("{Empid}")]
+        ////[ActionName("GetTodo")]
+        //public async Task<IActionResult> Todo(string username)
+        //{
+        //    var todolist =await _mainDbContext.Todos
+        // .FromSqlRaw("SELECT * FROM Todos WHERE Status =10 AND Assignee = @username", new SqlParameter("@username", username))
+        // .ToListAsync();
+        //    if (todolist != null)
+        //    {
+        //        return Ok(todolist);
+        //    }
+        //    return NotFound("Task not found");
+        //}
 
-        [HttpGet("gettodosbyempid/{Empid}")]
-        //[Route("{Empid}")]
-        //[ActionName("GetTodo")]
-        public async Task<IActionResult> Todo(string Empid)
-        {
-            var todolist =await _mainDbContext.Todos
-         .FromSqlRaw("SELECT * FROM Todos WHERE Status =10 AND AssignedTo = @Empid", new SqlParameter("@Empid", Empid))
-         .ToListAsync();
-            if (todolist != null)
-            {
-                return Ok(todolist);
-            }
-            return NotFound("Task not found");
-        }
 
-        [HttpGet("getInprogressByempid/{Empid}")]
-        //[Route("{Empid}")]
-        //[ActionName("GetTodo")]
-        public async Task<IActionResult> Inprogress(string Empid)
-        {
-            var todolist = await _mainDbContext.Todos
-         .FromSqlRaw("SELECT * FROM Todos WHERE Status =20 AND AssignedTo = @Empid", new SqlParameter("@Empid", Empid))
-         .ToListAsync();
-            if (todolist != null)
-            {
-                return Ok(todolist);
-            }
-            return NotFound("Task not found");
-        }
-
-        [HttpGet("getDoneByempid/{Empid}")]
-        //[Route("{Empid}")]
-        //[ActionName("GetTodo")]
-        public async Task<IActionResult> Done(string Empid)
+        [HttpGet("getalltodos")]
+        public async Task<IActionResult> Todo()
         {
             var todolist = await _mainDbContext.Todos
-         .FromSqlRaw("SELECT * FROM Todos WHERE Status =30 AND AssignedTo = @Empid", new SqlParameter("@Empid", Empid))
-         .ToListAsync();
+                .FromSqlRaw("SELECT * FROM Todos WHERE Status = 10")
+                .ToListAsync();
             if (todolist != null)
             {
                 return Ok(todolist);
             }
             return NotFound("Task not found");
         }
+
+        // filtered employee status 20.....................
+        //[HttpGet("getInprogressByempid/{Empid}")]
+        ////[Route("{Empid}")]
+        ////[ActionName("GetTodo")]
+        //public async Task<IActionResult> Inprogress(string Empid)
+        //{
+        //    var todolist = await _mainDbContext.Todos
+        // .FromSqlRaw("SELECT * FROM Todos WHERE Status =20 AND AssignedTo = @Empid", new SqlParameter("@Empid", Empid))
+        // .ToListAsync();
+        //    if (todolist != null)
+        //    {
+        //        return Ok(todolist);
+        //    }
+        //    return NotFound("Task not found");
+        //}
+
+        [HttpGet("getInprogress")]
+        public async Task<IActionResult> Inprogress()
+        {
+            var todolist = await _mainDbContext.Todos
+                .FromSqlRaw("SELECT * FROM Todos WHERE Status = 20")
+                .ToListAsync();
+            if (todolist != null)
+            {
+                return Ok(todolist);
+            }
+            return NotFound("Task not found");
+        }
+
+
+        //filtered employee when status 30....................
+        //[HttpGet("getDoneByempid/{Empid}")]
+        ////[Route("{Empid}")]
+        ////[ActionName("GetTodo")]
+        //public async Task<IActionResult> Done(string Empid)
+        //{
+        //    var todolist = await _mainDbContext.Todos
+        // .FromSqlRaw("SELECT * FROM Todos WHERE Status =30 AND AssignedTo = @Empid", new SqlParameter("@Empid", Empid))
+        // .ToListAsync();
+        //    if (todolist != null)
+        //    {
+        //        return Ok(todolist);
+        //    }
+        //    return NotFound("Task not found");
+        //}
+
+        [HttpGet("getDone")]
+        public async Task<IActionResult> Done()
+        {
+            var todolist = await _mainDbContext.Todos
+                .FromSqlRaw("SELECT * FROM Todos WHERE Status = 30")
+                .ToListAsync();
+            if (todolist != null)
+            {
+                return Ok(todolist);
+            }
+            return NotFound("Task not found");
+        }
+//...........................dashboard..................................................
+
+        [HttpGet("GetHighPriorityTaskCount")]
+        public async Task<IActionResult> GetHighPriorityTaskCount()
+        {
+            var highPriorityCount = await _mainDbContext.Todos.CountAsync(x => x.Priority == "high");
+
+            return Ok(highPriorityCount);
+        }
+
+        [HttpGet("GetLowPriorityTaskCount")]
+        public async Task<IActionResult> GetLowPriorityTaskCount()
+        {
+            var highPriorityCount = await _mainDbContext.Todos.CountAsync(x => x.Priority == "low");
+
+            return Ok(highPriorityCount);
+        }
+
+        [HttpGet("GetNormalPriorityTaskCount")]
+        public async Task<IActionResult> GetNormalPriorityTaskCount()
+        {
+            var highPriorityCount = await _mainDbContext.Todos.CountAsync(x => x.Priority == "normal");
+
+            return Ok(highPriorityCount);
+        }
+
+
+
+        [HttpGet]
+        [Route("todos/count")]
+        public async Task<IActionResult> GetTodoCount()
+        {
+            var count = await _mainDbContext.Todos.CountAsync(x => x.Status == 10);
+            return Ok(count);
+        }
+
+        [HttpGet]
+        [Route("inprogress/count")]
+        public async Task<IActionResult> GetInProgressCount()
+        {
+            var count = await _mainDbContext.Todos.CountAsync(x => x.Status == 20);
+            return Ok(count);
+        }
+
+        [HttpGet]
+        [Route("done/count")]
+        public async Task<IActionResult> GetDoneCount()
+        {
+            var count = await _mainDbContext.Todos.CountAsync(x => x.Status == 30);
+            return Ok(count);
+        }
+
 
         //..................................mobile app api.........................................................................
 
@@ -201,8 +297,8 @@ namespace BackendAPI.Controllers
             return NotFound("Task not found");
         }
 
-        [HttpGet("EmployeebyUserID/{userid}")]
-        public async Task<IActionResult> GetEmployeebyUserID(string userid)
+        [HttpGet("EmployeebyUserName/{name}")]
+        public async Task<IActionResult> GetEmployeebyUserID(string name)
         {
             //using IDbConnection conn = new SqlConnection(this.configuration.GetConnectionString("DBConnection"));
             //var employeeid = await _mainDbContext.QueryAsync("BM.spGetJobDetailsandBArgeAllocationGrid", commandType: CommandType.StoredProcedure);
@@ -212,12 +308,12 @@ namespace BackendAPI.Controllers
             {
                 connection.Open();
                 var para = new DynamicParameters();
-                para.Add("@userid", userid);
-                var employeeid = await connection.QueryAsync<dynamic>("GetTodsByUserId", para, commandType: CommandType.StoredProcedure);
+                para.Add("@name", name);
+                var Name = await connection.QueryAsync<dynamic>("GetTodsByUserName", para, commandType: CommandType.StoredProcedure);
                 
-                if (employeeid != null)
+                if (Name != null)
                 {
-                    return Ok(employeeid);
+                    return Ok(Name);
                 }
                 else
                 {

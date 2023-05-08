@@ -85,5 +85,17 @@ namespace BackendAPI.Controllers
 
             return NotFound("Project not found");
         }
+
+
+        [HttpGet("ActiveProjectCount")]
+        public async Task<IActionResult> GetActiveProjectCount()
+        {
+            var count = await _mainDbContext.Projects
+                .Where(c => c.Status == 1)
+                .CountAsync();
+
+            return Ok(count);
+        }
+
     }
 }

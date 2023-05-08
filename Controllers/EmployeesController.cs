@@ -54,7 +54,7 @@ namespace BackendAPI.Controllers
                 Address = employee.Address,
                 PhoneNumber = employee.PhoneNumber,
                 User_Id = userId.ToString()
-        };
+            };
             
    
             await _mainDbContext.Employees.AddAsync(employeeobj);
@@ -120,5 +120,14 @@ namespace BackendAPI.Controllers
 
             return NotFound("Employee not found");
         }
+
+        [HttpGet]
+        [Route("employee-count")]
+        public async Task<IActionResult> GetEmployeeCount()
+        {
+            int count = await _mainDbContext.Employees.CountAsync();
+            return Ok(new { count });
+        }
+
     }
 }

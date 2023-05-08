@@ -48,17 +48,16 @@ namespace BackendAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("customerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double>("paidAmount")
+                    b.Property<double>("Amount")
                         .HasColumnType("float");
 
-                    b.Property<double>("price")
-                        .HasColumnType("float");
+                    b.Property<string>("CustomerPhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("tax")
-                        .HasColumnType("float");
+                    b.Property<string>("installmentName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -149,15 +148,7 @@ namespace BackendAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Empid")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Employee_name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Taskid")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -226,7 +217,7 @@ namespace BackendAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AssignedTo")
+                    b.Property<string>("Assignee")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -247,7 +238,7 @@ namespace BackendAPI.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<string>("sprint_id")
+                    b.Property<string>("sprint_Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -289,6 +280,37 @@ namespace BackendAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("BackendAPI.Models.UserClient", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserClients");
                 });
 #pragma warning restore 612, 618
         }

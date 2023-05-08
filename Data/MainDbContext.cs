@@ -19,6 +19,8 @@ namespace BackendAPI.Data
         public DbSet<Billing> Billings { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
 
-        public DbSet<Perfomence> perfomences { get; set; }  
+        public DbSet<Perfomence> perfomences { get; set; }
+        public DbSet<UserClient> UserClients { get; set; }
+
     }
 }

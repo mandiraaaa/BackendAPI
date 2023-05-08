@@ -202,38 +202,67 @@ namespace BackendAPI.Controllers
         //    });
         //}
 
-        [HttpPost("authenticateclient")]
-        public async Task<IActionResult> AuthenticateClient([FromBody] User user)
+
+        //mobile app
+
+        [HttpPost("registerClient")]
+
+        public async Task<IActionResult> RegisterClient([FromBody] UserClient userclient)
         {
-            if (user == null)
+            if (userclient == null)
+                return BadRequest();
+            //check username
+            if (await CheckPhoneNumberExistingAsync(userclient.PhoneNumber))
+                return BadRequest(new { Message = "Phone Number Already Exist" });
+
+            //check password
+            var pass = CheckPasswordStrength(userclient.Password);
+            if (!string.IsNullOrEmpty(pass))
+                return BadRequest(new { Message = pass.ToString() });
+
+            //userclient.Password = PasswordHasher.HashPassword(userclient.Password);
+            userclient.Token = "";
+            await _mainDbContext.UserClients.AddAsync(userclient);
+            await _mainDbContext.SaveChangesAsync();
+            return Ok(new
+            {
+                Message = "User Registered!"
+            });
+        }
+
+
+        [HttpPost("authenticateclient")]
+        public async Task<IActionResult> AuthenticateClient([FromBody] UserClient userclient)
+        {
+            if (userclient == null)
                 return BadRequest();
 
-            var userobj = await _mainDbContext.Users.DefaultIfEmpty()
-                .FirstOrDefaultAsync(x => x.UserName == user.UserName);
-            if (userobj == null)
+            var userclobj = await _mainDbContext.UserClients.DefaultIfEmpty()
+                .FirstOrDefaultAsync(x => x.PhoneNumber == userclient.PhoneNumber);
+            if (userclobj == null)
                 return NotFound(new { Message = "User Not Found!" });
 
-            if (userobj.Password != user.Password)
+            if (userclobj.Password != userclient.Password)
             {
                 return BadRequest(new { Message = "Incorrect Password" });
             }
 
-            userobj.Token = CreateJwtForApp(userobj);
+            userclobj.Token = CreateJwtForApp(userclobj);
 
             return Ok(new
             {
-                Token = userobj.Token,
+                Token = userclobj.Token,
                 Message = "Login Success!"
             });
         }
 
-        private string CreateJwtForApp(User user)
+        private string CreateJwtForApp(UserClient userclient)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("veryverysecret....");
             var identity = new ClaimsIdentity(new Claim[]
             {
-        new Claim(ClaimTypes.Name, user.Name)
+        new Claim(ClaimTypes.Name, userclient.PhoneNumber)
             });
 
             var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
@@ -248,7 +277,11 @@ namespace BackendAPI.Controllers
             return jwtTokenHandler.WriteToken(token);
         }
 
+        private Task<bool> CheckPhoneNumberExistingAsync(string phonenumber)
+            => _mainDbContext.UserClients.AnyAsync(x => x.PhoneNumber == phonenumber);
 
+
+       
 
 
 
