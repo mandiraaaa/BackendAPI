@@ -19,7 +19,7 @@ namespace BackendAPI.Models
         public string Address { get; set; }
 
         public string PhoneNumber { get; set; }
-        public string User_Id { get; set; }
+        public string Uname { get; set; }
 
 
         //protected override void OnModelCreating(ModelBuilder modelBuilder)

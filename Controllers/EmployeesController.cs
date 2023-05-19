@@ -40,32 +40,42 @@ namespace BackendAPI.Controllers
         }
 
         // add employee
+        //[HttpPost]
+        //public async Task<IActionResult> AddEmployee([FromBody] EmployeeRequestModel employee)
+        //{
+        //    var userId = _mainDbContext.Users.Where(u => u.Name == employee.Name).Select(u => u.Id).FirstOrDefault();
+        //    var employeeobj = new Employee()
+        //    {
+        //        Id = Guid.NewGuid(),
+        //        Name = employee.Name,
+        //        JobRole = employee.JobRole,
+        //        JoinedDate = employee.JoinedDate,
+        //        Salary = employee.Salary,
+        //        Address = employee.Address,
+        //        PhoneNumber = employee.PhoneNumber,
+        //        Uname = userId.ToString()
+        //    };
+
+
+        //    await _mainDbContext.Employees.AddAsync(employeeobj);
+        //    await _mainDbContext.SaveChangesAsync();
+
+        //    return CreatedAtAction(nameof(GetEmployee), new {id = employeeobj.Id }, employee);
+        //}
+
         [HttpPost]
-        public async Task<IActionResult> AddEmployee([FromBody] EmployeeRequestModel employee)
+        public async Task<IActionResult> AddEmployee([FromBody] Employee employee)
         {
-            var userId = _mainDbContext.Users.Where(u => u.Name == employee.Name).Select(u => u.Id).FirstOrDefault();
-            var employeeobj = new Employee()
-            {
-                Id = Guid.NewGuid(),
-                Name = employee.Name,
-                JobRole = employee.JobRole,
-                JoinedDate = employee.JoinedDate,
-                Salary = employee.Salary,
-                Address = employee.Address,
-                PhoneNumber = employee.PhoneNumber,
-                User_Id = userId.ToString()
-            };
-            
-   
-            await _mainDbContext.Employees.AddAsync(employeeobj);
+            employee.Id = Guid.NewGuid();
+            await _mainDbContext.Employees.AddAsync(employee);
             await _mainDbContext.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetEmployee), new {id = employeeobj.Id }, employee);
+            return CreatedAtAction(nameof(GetEmployee), new { id = employee.Id }, employee);
         }
 
         //update an employee
-       [HttpPut]
-       [Route("{id:guid}")]
+        [HttpPut]
+        [Route("{id:guid}")]
         public async Task<IActionResult> UpdateEmployee([FromRoute] Guid id, [FromBody] Employee employee)
         {
             var existingEmployee = await _mainDbContext.Employees.FirstOrDefaultAsync(x => x.Id == id);

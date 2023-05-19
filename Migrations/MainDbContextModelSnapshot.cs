@@ -126,7 +126,7 @@ namespace BackendAPI.Migrations
                     b.Property<decimal>("Salary")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("User_Id")
+                    b.Property<string>("Uname")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

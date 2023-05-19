@@ -30,9 +30,9 @@ namespace BackendAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllTodos()
         {
-            var sprints = await _mainDbContext.Sprints.ToListAsync();
+            var todo = await _mainDbContext.Todos.ToListAsync();
 
-            return Ok(sprints);
+            return Ok(todo);
         }
 
         // get single task
@@ -215,7 +215,104 @@ namespace BackendAPI.Controllers
             }
             return NotFound("Task not found");
         }
-//...........................dashboard..................................................
+
+        [HttpGet("sprint/tasks/{sprintName}")]
+        public async Task<IActionResult> GetTasksBySprint(string sprintName)
+        {
+            var tasks = await _mainDbContext.Todos
+                .Where(t => t.sprint_Name == sprintName && (t.Status == 10 || t.Status == 20 || t.Status == 30))
+                .ToListAsync();
+
+            if (tasks != null && tasks.Count > 0)
+            {
+                return Ok(tasks);
+            }
+            else
+            {
+                return NotFound("Tasks not found for the specified sprint");
+            }
+        }
+
+        [HttpGet("gettasksforactivesprint")]
+        public async Task<IActionResult> GetTasksForActiveSprint()
+        {
+            // Get the active sprint
+            var sprint = await _mainDbContext.Sprints.FirstOrDefaultAsync(x => x.Status == 1);
+            if (sprint == null)
+            {
+                return NotFound("Active sprint not found");
+            }
+
+            // Get all the tasks related to the active sprint
+            var taskList = await _mainDbContext.Todos
+                .Where(x => x.sprint_Name == sprint.Name)
+                .ToListAsync();
+
+            if (taskList != null)
+            {
+                return Ok(taskList);
+            }
+
+            return NotFound("Tasks not found");
+        }
+
+        [HttpGet("tasks/employee/{employeeName}")]
+        public async Task<IActionResult> GetTasksByEmployeeName(string employeeName)
+        {
+            // Get active sprint
+            var sprint = await _mainDbContext.Sprints.FirstOrDefaultAsync(x => x.Status == 1);
+
+            if (sprint == null)
+            {
+                return NotFound("No active sprint found");
+            }
+
+            // Get tasks assigned to the employee in the active sprint
+            var tasks = await _mainDbContext.Todos
+                .Where(x => x.Assignee == employeeName && x.sprint_Name == sprint.Name)
+                .ToListAsync();
+
+            if (tasks.Count == 0)
+            {
+                return NotFound("No tasks found for the employee in the active sprint");
+            }
+
+            return Ok(tasks);
+        }
+
+        //App..........................(not used)
+        [HttpGet("tasks/employeeforTodotasks/{employeeName}")]
+        public async Task<IActionResult> GetTodoTasksByEmployeeName(string employeeName)
+        {
+            // Get active sprint
+            var sprint = await _mainDbContext.Sprints.FirstOrDefaultAsync(x => x.Status == 1);
+
+            if (sprint == null)
+            {
+                return NotFound("No active sprint found");
+            }
+
+            // Get tasks assigned to the employee in the active sprint with status 10
+            var tasks = await _mainDbContext.Todos
+                .Where(x => x.Assignee == employeeName && x.sprint_Name == sprint.Name && x.Status == 10)
+                .ToListAsync();
+
+            if (tasks.Count == 0)
+            {
+                return NotFound("No tasks found for the employee in the active sprint with status 10");
+            }
+
+            return Ok(tasks);
+        }
+
+
+
+
+
+
+
+
+        //...........................dashboard..................................................
 
         [HttpGet("GetHighPriorityTaskCount")]
         public async Task<IActionResult> GetHighPriorityTaskCount()
@@ -266,6 +363,14 @@ namespace BackendAPI.Controllers
             var count = await _mainDbContext.Todos.CountAsync(x => x.Status == 30);
             return Ok(count);
         }
+
+        [HttpGet("GetAllTodostasksCount")]
+        public async Task<IActionResult> GetAllTodostasksCount()
+        {
+            var count = await _mainDbContext.Todos.CountAsync();
+            return Ok(count);
+        }
+
 
 
         //..................................mobile app api.........................................................................
